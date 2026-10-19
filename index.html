@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>생활정보</title>
 <meta name="description" content="생활정보 – 핵심만 짧게 정리한 소식">
 <meta name="google-site-verification" content="bxykyrvW570LVGUY8ZcUnPP1yBbkwfh5UWvmjvEORA0" />
@@ -25,14 +26,18 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:16px;margin-bottom:24px;font-family:"Noto Sans KR",sans-serif}
 header a.site{font-weight:600;font-size:18px;color:var(--ink);text-decoration:none}
 header span{color:var(--muted);font-size:14px}
-.ad-top{display:flex;justify-content:center;margin:0 auto 28px;min-height:50px}
+
+/* 광고 공통: 높이 확보(CLS 방지) + 콘텐츠와 간격 분리 */
+.ad{display:flex;justify-content:center;align-items:center;overflow:hidden}
+.ad-top{margin:0 auto 32px;min-height:50px}
+.ad-mid{margin:32px 0;min-height:50px}
+.ad-bottom{margin:56px 0 0;min-height:100px}
+.ad-side{min-height:100px}
+
 .layout{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}
-.layout main{width:100%;max-width:680px;margin:0 auto}
+.layout main{width:100%;max-width:680px;margin:0 auto;min-width:0}
 aside{display:none}
 @media (min-width:1000px){.layout{grid-template-columns:minmax(0,680px) 320px;justify-content:space-between}.layout main{margin:0}aside{display:block}.side-sticky{position:sticky;top:24px}}
-.ad-bottom{display:flex;justify-content:center;margin:48px 0 0;min-height:100px}
-.ad-mid{display:flex;justify-content:center;margin:28px 0;min-height:50px}
-
 
 /* 글 목록 */
 .post-item{display:grid;grid-template-columns:110px 1fr;gap:6px 20px;padding:22px 0;border-bottom:1px solid var(--rule)}
@@ -42,133 +47,179 @@ aside{display:none}
 .post-item h2 a{color:var(--ink);text-decoration:none}
 .post-item h2 a:hover{color:var(--accent);text-decoration:underline}
 .post-item p{margin:0;color:var(--muted);font-size:15px;line-height:1.7}
-.post-item .thumb{grid-column:2;display:block;width:100%;max-width:320px;aspect-ratio:16/9;object-fit:cover;background:var(--rule);margin-bottom:6px}
-.post-item .txt{grid-column:2}
+.post-item .thumb{display:block;width:100%;max-width:320px;aspect-ratio:16/9;object-fit:cover;background:var(--rule);margin-bottom:6px}
+.post-item .txt{grid-column:2;min-width:0}
+.empty{color:var(--muted);font-family:"Noto Sans KR",sans-serif}
 
 /* 글 보기 */
-article h1{font-size:32px;line-height:1.4;margin:0 0 8px}
+article h1{font-size:32px;line-height:1.4;margin:0 0 8px;word-break:keep-all}
 article time{font:400 14px "Noto Sans KR",sans-serif;color:var(--muted)}
 article .cover{display:block;width:100%;height:auto;margin:24px 0 0}
-article .body{margin-top:28px}
+article .body{margin-top:28px;overflow-wrap:anywhere}
 article .body h2{font-size:22px;margin:2em 0 .4em}
 article .body img{max-width:100%;height:auto;display:block;margin:1.4em 0}
 article .body code{font-size:.9em;background:var(--rule);padding:1px 6px;border-radius:3px}
 .src{margin-top:40px;padding-top:16px;border-top:1px solid var(--rule);font:400 14px "Noto Sans KR",sans-serif;color:var(--muted)}
 .back{display:inline-block;margin-bottom:20px;font:400 14px "Noto Sans KR",sans-serif}
 footer{margin-top:56px;color:var(--muted);font:400 13px "Noto Sans KR",sans-serif}
-@media (max-width:560px){.post-item{grid-template-columns:1fr}.post-item .thumb,.post-item .txt{grid-column:1;max-width:none}article h1{font-size:26px}}
+@media (max-width:560px){.post-item{grid-template-columns:1fr}.post-item .txt{grid-column:1;max-width:none}.post-item .thumb{max-width:none}article h1{font-size:26px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <a class="site" href="#/">뉴스정보</a>
+    <a class="site" href="#/">생활정보</a>
     <span>핵심만 짧게 정리합니다</span>
   </header>
 
-  <!-- 상단 광고 (카카오 애드핏) -->
-  <div class="ad-top">
+  <!-- 상단 광고 (카카오 애드핏) : 스크립트는 하단에서 한 번만 로드 -->
+  <div class="ad ad-top">
     <ins class="kakao_ad_area" style="display:none;"
       data-ad-unit="DAN-c5QQGJp11vYFryEP"
       data-ad-width="320"
       data-ad-height="50"></ins>
-    <script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>
   </div>
 
   <div class="layout">
     <main id="app"></main>
     <aside>
       <div class="side-sticky">
-        <!-- 사이드 광고 (카카오 애드핏) -->
-        <ins class="kakao_ad_area" style="display:none;"
-          data-ad-unit="DAN-wDG5ZsmoG1xgEb33"
-          data-ad-width="320"
-          data-ad-height="100"></ins>
-        <script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>
+        <!-- 사이드 광고 : 데스크톱(≥1000px)에서만 유지, 모바일에서는 JS가 제거 -->
+        <div class="ad ad-side">
+          <ins class="kakao_ad_area" style="display:none;"
+            data-ad-unit="DAN-wDG5ZsmoG1xgEb33"
+            data-ad-width="320"
+            data-ad-height="100"></ins>
+        </div>
       </div>
     </aside>
   </div>
 
   <!-- 하단 광고 (카카오 애드핏) -->
-  <div class="ad-bottom">
+  <div class="ad ad-bottom">
     <ins class="kakao_ad_area" style="display:none;"
       data-ad-unit="DAN-lJvnwZZnuWU4nAA7"
       data-ad-width="320"
       data-ad-height="100"></ins>
-    <script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>
   </div>
 
-  <footer>© <span id="y"></span> 뉴스정보</footer>
+  <footer>© <span id="y"></span> 생활정보</footer>
 </div>
 
 <script>
-/* ===== 중간 광고 (카카오 애드핏) ===== */
-const MID_AD = `<div class="ad-mid"><ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-g5KAvJ47oxKVfx9s" data-ad-width="320" data-ad-height="50"></ins></div>`;
-function loadAdfit(root) {
-  if (!root.querySelector("ins.kakao_ad_area")) return;
-  const sc = document.createElement("script");
-  sc.async = true; sc.src = "//t1.kakaocdn.net/kas/static/ba.min.js";
-  root.appendChild(sc);
+const SITE = "생활정보";
+const DEFAULT_DESC = "생활정보 - 핵심만 짧게 정리한 소식";
+
+/* ===== 광고 ===== */
+const MID_AD = `<div class="ad ad-mid"><ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-g5KAvJ47oxKVfx9s" data-ad-width="320" data-ad-height="50"></ins></div>`;
+
+// 모바일에서는 display:none 영역의 사이드 광고를 아예 제거 (숨겨진 광고 = 정책 위반/무효 노출)
+if (!matchMedia("(min-width:1000px)").matches) {
+  document.querySelector("aside")?.remove();
 }
 
-/* ===== 글 목록 =====
-   글은 posts.json 에 저장됩니다. 글쓰기는 editor.html 에서 하세요. */
-let POSTS = [];
+// 애드핏 스크립트는 하나만 유지. 화면을 다시 그린 뒤 재삽입하면 아직 렌더되지 않은 <ins>만 채워짐
+function loadAdfit() {
+  document.getElementById("adfit-js")?.remove();
+  const sc = document.createElement("script");
+  sc.id = "adfit-js";
+  sc.async = true;
+  sc.src = "https://t1.kakaocdn.net/kas/static/ba.min.js";
+  document.body.appendChild(sc);
+}
 
+/* ===== 유틸 ===== */
+let POSTS = [];
 const app = document.getElementById("app");
 document.getElementById("y").textContent = new Date().getFullYear();
 
-const fmt = d => d.replace(/-/g, ".");
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = d => String(d || "").replace(/-/g, ".");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
+function safeUrl(u) {
+  try {
+    const x = new URL(u);
+    return /^https?:$/.test(x.protocol) ? x : null;
+  } catch { return null; }
+}
+
+function setMeta(title, desc) {
+  document.title = title;
+  const d = desc || DEFAULT_DESC;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", d);
+  document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+  document.querySelector('meta[property="og:description"]')?.setAttribute("content", d);
+}
+
+/* ===== 렌더 ===== */
 function renderList() {
-  document.title = "뉴스정보";
-  const items = POSTS.map((p, i) => `
+  setMeta(SITE);
+  if (!POSTS.length) {
+    app.innerHTML = `<p class="empty">등록된 글이 없습니다.</p>`;
+    return;
+  }
+  const adAt = Math.min(2, POSTS.length - 1);
+  app.innerHTML = POSTS.map((p, i) => `
     <section class="post-item">
-      <div class="meta"><time datetime="${p.date}">${fmt(p.date)}</time><br>${esc(p.category || "")}</div>
+      <div class="meta"><time datetime="${esc(p.date)}">${fmt(p.date)}</time><br>${esc(p.category || "")}</div>
       <div class="txt">
-        ${p.image ? `<a href="#/${p.id}"><img class="thumb" src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy"></a>` : ""}
-        <h2><a href="#/${p.id}">${esc(p.title)}</a></h2>
+        ${p.image ? `<a href="#/${encodeURIComponent(p.id)}"><img class="thumb" src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy"></a>` : ""}
+        <h2><a href="#/${encodeURIComponent(p.id)}">${esc(p.title)}</a></h2>
         <p>${esc(p.summary)}</p>
       </div>
-    </section>${i === Math.min(2, POSTS.length - 1) ? MID_AD : ""}`).join("");
-  app.innerHTML = items;
-  loadAdfit(app);
+    </section>${i === adAt ? MID_AD : ""}`).join("");
 }
 
 function renderPost(id) {
   const p = POSTS.find(x => x.id === id);
   if (!p) {
+    setMeta("글을 찾을 수 없습니다 – " + SITE);
     app.innerHTML = `<p>글을 찾을 수 없습니다. <a href="#/">목록으로 돌아가기</a></p>`;
     return;
   }
-  document.title = p.title + " – 뉴스정보";
-  // 본문 두 번째 문단 뒤에 중간 광고 삽입 (문단이 적으면 첫 문단 뒤)
-  const parts = p.html.split("</p>");
+  setMeta(p.title + " – " + SITE, p.summary);
+
+  // 본문 두 번째 문단 뒤에 중간 광고 (문단이 적으면 첫 문단 뒤)
+  const parts = String(p.html || "").split("</p>");
   const at = parts.length > 3 ? 2 : 1;
-  const body = parts.map((t, i) => (i < parts.length - 1 ? t + "</p>" : t) + (i === at - 1 ? MID_AD : "")).join("");
+  const body = parts.map((t, i) =>
+    (i < parts.length - 1 ? t + "</p>" : t) + (i === at - 1 ? MID_AD : "")
+  ).join("");
+
+  const src = p.source ? safeUrl(p.source) : null;
   app.innerHTML = `
     <a class="back" href="#/">목록으로 돌아가기</a>
     <article>
       <h1>${esc(p.title)}</h1>
-      <time datetime="${p.date}">${fmt(p.date)}${p.category ? " · " + esc(p.category) : ""}</time>
+      <time datetime="${esc(p.date)}">${fmt(p.date)}${p.category ? " · " + esc(p.category) : ""}</time>
       ${p.image ? `<img class="cover" src="${esc(p.image)}" alt="${esc(p.title)}">` : ""}
       <div class="body">${body}</div>
-      ${p.source ? `<p class="src">출처: <a href="${esc(p.source)}" rel="noopener" target="_blank">${esc(new URL(p.source).hostname)}</a></p>` : ""}
+      ${src ? `<p class="src">출처: <a href="${esc(src.href)}" rel="noopener noreferrer" target="_blank">${esc(src.hostname)}</a></p>` : ""}
     </article>`;
-  loadAdfit(app);
 }
 
 function route() {
-  const id = location.hash.replace(/^#\/?/, "");
+  let id = location.hash.replace(/^#\/?/, "");
+  try { id = decodeURIComponent(id); } catch {}
   id ? renderPost(id) : renderList();
   window.scrollTo(0, 0);
+  loadAdfit(); // 렌더 후 광고 채우기 (정적 광고 + 중간 광고)
 }
+
 window.addEventListener("hashchange", route);
-fetch("posts.json?t=" + Date.now())
-  .then(r => r.json())
-  .then(d => { POSTS = d; route(); })
-  .catch(() => { app.innerHTML = "<p>글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>"; });
+
+fetch("posts.json", { cache: "no-cache" })
+  .then(r => {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  })
+  .then(d => {
+    POSTS = (Array.isArray(d) ? d : []).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    route();
+  })
+  .catch(() => {
+    app.innerHTML = "<p>글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>";
+  });
 </script>
 </body>
 </html>
