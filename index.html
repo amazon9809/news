@@ -22,6 +22,7 @@ header a.site{font-weight:600;font-size:18px;color:var(--ink);text-decoration:no
 header span{color:var(--muted);font-size:14px}
 .ad-top{display:flex;justify-content:center;margin:0 auto 28px;min-height:50px}
 .layout{max-width:680px;margin:0 auto}
+.ad-mid{display:flex;justify-content:center;margin:28px 0;min-height:50px}
 
 
 /* 글 목록 */
@@ -73,6 +74,15 @@ footer{margin-top:56px;color:var(--muted);font:400 13px "Noto Sans KR",sans-seri
 </div>
 
 <script>
+/* ===== 중간 광고 (카카오 애드핏) ===== */
+const MID_AD = `<div class="ad-mid"><ins class="kakao_ad_area" style="display:none;" data-ad-unit="DAN-g5KAvJ47oxKVfx9s" data-ad-width="320" data-ad-height="50"></ins></div>`;
+function loadAdfit(root) {
+  if (!root.querySelector("ins.kakao_ad_area")) return;
+  const sc = document.createElement("script");
+  sc.async = true; sc.src = "//t1.kakaocdn.net/kas/static/ba.min.js";
+  root.appendChild(sc);
+}
+
 /* ===== 글 목록 =====
    글은 posts.json 에 저장됩니다. 글쓰기는 editor.html 에서 하세요. */
 let POSTS = [];
@@ -85,7 +95,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":
 
 function renderList() {
   document.title = "뉴스정보";
-  const items = POSTS.map(p => `
+  const items = POSTS.map((p, i) => `
     <section class="post-item">
       <div class="meta"><time datetime="${p.date}">${fmt(p.date)}</time><br>${esc(p.category || "")}</div>
       <div class="txt">
@@ -93,8 +103,9 @@ function renderList() {
         <h2><a href="#/${p.id}">${esc(p.title)}</a></h2>
         <p>${esc(p.summary)}</p>
       </div>
-    </section>`).join("");
+    </section>${i === Math.min(2, POSTS.length - 1) ? MID_AD : ""}`).join("");
   app.innerHTML = items;
+  loadAdfit(app);
 }
 
 function renderPost(id) {
@@ -104,15 +115,20 @@ function renderPost(id) {
     return;
   }
   document.title = p.title + " – 뉴스정보";
+  // 본문 두 번째 문단 뒤에 중간 광고 삽입 (문단이 적으면 첫 문단 뒤)
+  const parts = p.html.split("</p>");
+  const at = parts.length > 3 ? 2 : 1;
+  const body = parts.map((t, i) => (i < parts.length - 1 ? t + "</p>" : t) + (i === at - 1 ? MID_AD : "")).join("");
   app.innerHTML = `
     <a class="back" href="#/">목록으로 돌아가기</a>
     <article>
       <h1>${esc(p.title)}</h1>
       <time datetime="${p.date}">${fmt(p.date)}${p.category ? " · " + esc(p.category) : ""}</time>
       ${p.image ? `<img class="cover" src="${esc(p.image)}" alt="${esc(p.title)}">` : ""}
-      <div class="body">${p.html}</div>
+      <div class="body">${body}</div>
       ${p.source ? `<p class="src">출처: <a href="${esc(p.source)}" rel="noopener" target="_blank">${esc(new URL(p.source).hostname)}</a></p>` : ""}
     </article>`;
+  loadAdfit(app);
 }
 
 function route() {
