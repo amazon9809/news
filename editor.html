@@ -128,7 +128,10 @@ function setStatus(msg, kind) { const s = $("status"); s.textContent = msg; s.cl
 
 /* ---- GitHub API ---- */
 async function api(path, opts = {}) {
-  const r = await fetch(`https://api.github.com/repos/${cfg.owner}/${cfg.repo}/${path}`, {
+  const sep = path.includes("?") ? "&" : "?";
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/${path}` + ((!opts.method || opts.method === "GET") ? sep + "_=" + Date.now() : "");
+  const r = await fetch(url, {
+    cache: "no-store",
     ...opts,
     headers: {Authorization:"Bearer "+cfg.token, Accept:"application/vnd.github+json", "Content-Type":"application/json"}
   });
@@ -172,9 +175,13 @@ $("list").onclick = async e => {
     if (!p || !confirm(`"${p.title}" 글을 삭제할까요?`)) return;
     try {
       setStatus("삭제하는 중…");
-      const f = await getPostsFile();
-      await putFile("posts.json", toB64(JSON.stringify(f.posts.filter(x => x.id !== del), null, 2)), "글 삭제: " + del, f.sha);
-      posts = f.posts.filter(x => x.id !== del); renderList(); setStatus("삭제했습니다. 1~2분 뒤 사이트에 반영됩니다.", "ok");
+      let rest;
+      for (let t = 0; t < 3; t++) {
+        const f = await getPostsFile(); rest = f.posts.filter(x => x.id !== del);
+        try { await putFile("posts.json", toB64(JSON.stringify(rest, null, 2)), "글 삭제: " + del, f.sha); break; }
+        catch (e) { if (!String(e.message).startsWith("409") || t === 2) throw e; await new Promise(r => setTimeout(r, 800)); }
+      }
+      posts = rest; renderList(); setStatus("삭제했습니다. 1~2분 뒤 사이트에 반영됩니다.", "ok");
     } catch (err) { setStatus("삭제 실패: " + err.message, "err"); }
   }
 };
@@ -268,11 +275,15 @@ $("publish").onclick = async () => {
       await putFile(used[i], pending[used[i]].b64, "이미지 추가: " + used[i]);
     }
     setStatus("글 저장하는 중…");
-    const f = await getPostsFile();
     const post = {id, title, date: $("f-date").value || today(), category: $("f-cat").value.trim(), summary: $("f-sum").value.trim(), image: coverPath, source: $("f-src").value.trim(), html};
-    const list = f.posts.filter(p => p.id !== (editingId || id) && p.id !== id);
-    list.push(post); list.sort((a, b) => b.date.localeCompare(a.date));
-    await putFile("posts.json", toB64(JSON.stringify(list, null, 2)), (editingId ? "글 수정: " : "글 발행: ") + id, f.sha);
+    let list;
+    for (let t = 0; t < 3; t++) {
+      const f = await getPostsFile();
+      list = f.posts.filter(p => p.id !== (editingId || id) && p.id !== id);
+      list.push(post); list.sort((a, b) => b.date.localeCompare(a.date));
+      try { await putFile("posts.json", toB64(JSON.stringify(list, null, 2)), (editingId ? "글 수정: " : "글 발행: ") + id, f.sha); break; }
+      catch (e) { if (!String(e.message).startsWith("409") || t === 2) throw e; await new Promise(r => setTimeout(r, 800)); }
+    }
     posts = list; renderList(); pending = {}; editingId = id; $("f-id").value = id; $("f-id").readOnly = true;
     $("formTitle").textContent = "글 수정";
     setStatus("발행했습니다. 1~2분 뒤 사이트에 반영됩니다.", "ok");
