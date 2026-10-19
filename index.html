@@ -83,8 +83,23 @@ footer{margin-top:56px;color:var(--muted);font:400 13px "Noto Sans KR",sans-seri
    client : 게시자 ID (ca-pub-…)
    slots  : 애드센스에서 광고 단위를 만들고 받은 숫자 ID. 비어 있으면 "광고 영역" 안내 박스가 보입니다. */
 const ADSENSE = {
-  client: "ca-pub-0000000000000000",
-  slots: { top: "", middle: "", side: "", bottom: "" }
+ slots: { top: "<ins class="kakao_ad_area" style="display:none;"
+data-ad-unit = "DAN-7lhIQ1I0kMIh1bJb"
+data-ad-width = "300"
+data-ad-height = "250"></ins>
+<script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>", middle: "<ins class="kakao_ad_area" style="display:none;"
+data-ad-unit = "DAN-s9OypHJZW7WKknd9"
+data-ad-width = "320"
+data-ad-height = "200"></ins>
+<script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>", side: "<ins class="kakao_ad_area" style="display:none;"
+data-ad-unit = "DAN-iWVWr7R1DvkZsdzM"
+data-ad-width = "250"
+data-ad-height = "250"></ins>
+<script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>", bottom: "<ins class="kakao_ad_area" style="display:none;"
+data-ad-unit = "DAN-8M3U8fP7BOQA9LF4"
+data-ad-width = "300"
+data-ad-height = "250"></ins>
+<script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>" }
 };
 const AD_LABEL = { top: "상단 광고 영역", middle: "중간 광고 영역", side: "사이드 광고 영역", bottom: "하단 광고 영역" };
 
