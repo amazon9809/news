@@ -20,6 +20,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:16px;margin-bottom:24px;font-family:"Noto Sans KR",sans-serif}
 header a.site{font-weight:600;font-size:18px;color:var(--ink);text-decoration:none}
 header span{color:var(--muted);font-size:14px}
+.ad-top{display:flex;justify-content:center;margin:0 auto 28px;min-height:50px}
 .layout{max-width:680px;margin:0 auto}
 
 
@@ -54,6 +55,15 @@ footer{margin-top:56px;color:var(--muted);font:400 13px "Noto Sans KR",sans-seri
     <a class="site" href="#/">뉴스정보</a>
     <span>핵심만 짧게 정리합니다</span>
   </header>
+
+  <!-- 상단 광고 (카카오 애드핏) -->
+  <div class="ad-top">
+    <ins class="kakao_ad_area" style="display:none;"
+      data-ad-unit="DAN-c5QQGJp11vYFryEP"
+      data-ad-width="320"
+      data-ad-height="50"></ins>
+    <script type="text/javascript" src="//t1.kakaocdn.net/kas/static/ba.min.js" async></script>
+  </div>
 
   <div class="layout">
     <main id="app"></main>
