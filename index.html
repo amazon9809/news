@@ -8,8 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600&family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
-<!-- ▼ 애드센스: ca-pub-0000000000000000 을 본인 게시자 ID로 바꾸세요 (아래 ADSENSE.client 도 같은 값) -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
 <style>
 :root{--bg:#eef2f5;--ink:#17212b;--muted:#5a6b7a;--rule:#cbd5dd;--accent:#0f6b6b;--adbg:rgba(0,0,0,.04)}
 @media (prefers-color-scheme:dark){:root{--bg:#10171d;--ink:#e6edf2;--muted:#93a4b3;--rule:#2a3641;--accent:#5fc4c0;--adbg:rgba(255,255,255,.05)}}
@@ -22,18 +20,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:16px;margin-bottom:24px;font-family:"Noto Sans KR",sans-serif}
 header a.site{font-weight:600;font-size:18px;color:var(--ink);text-decoration:none}
 header span{color:var(--muted);font-size:14px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}
-@media (min-width:960px){.layout{grid-template-columns:minmax(0,680px) 300px;justify-content:space-between}}
-aside{display:none}
-@media (min-width:960px){aside{display:block}.side-sticky{position:sticky;top:24px}}
+.layout{max-width:680px;margin:0 auto}
 
-/* 광고 영역 */
-.ad{margin:28px 0;text-align:center;font-family:"Noto Sans KR",sans-serif}
-.ad ins{display:block}
-.ad-ph{display:flex;align-items:center;justify-content:center;border:1px dashed var(--rule);background:var(--adbg);color:var(--muted);font-size:13px}
-.ad-top .ad-ph,.ad-bottom .ad-ph{min-height:90px}
-.ad-middle .ad-ph{min-height:250px}
-.ad-side .ad-ph{min-height:600px}
 
 /* 글 목록 */
 .post-item{display:grid;grid-template-columns:110px 1fr;gap:6px 20px;padding:22px 0;border-bottom:1px solid var(--rule)}
@@ -67,57 +55,27 @@ footer{margin-top:56px;color:var(--muted);font:400 13px "Noto Sans KR",sans-seri
     <span>핵심만 짧게 정리합니다</span>
   </header>
 
-  <div id="ad-top"></div>
-
   <div class="layout">
     <main id="app"></main>
-    <aside><div class="side-sticky" id="ad-side"></div></aside>
   </div>
 
-  <div id="ad-bottom"></div>
   <footer>© <span id="y"></span> 뉴스정보</footer>
 </div>
 
 <script>
-/* ===== 애드센스 설정 =====
-   client : 게시자 ID (ca-pub-…)
-   slots  : 애드센스에서 광고 단위를 만들고 받은 숫자 ID. 비어 있으면 "광고 영역" 안내 박스가 보입니다. */
-const ADSENSE = {
-  client: "ca-pub-0000000000000000",
-  slots: { top: "", middle: "", side: "", bottom: "" }
-};
-const AD_LABEL = { top: "상단 광고 영역", middle: "중간 광고 영역", side: "사이드 광고 영역", bottom: "하단 광고 영역" };
-
-function adHTML(pos) {
-  const slot = ADSENSE.slots[pos];
-  if (slot && ADSENSE.client.indexOf("0000000000000000") === -1) {
-    return `<div class="ad ad-${pos}"><ins class="adsbygoogle" data-ad-client="${ADSENSE.client}" data-ad-slot="${slot}" data-ad-format="auto" data-full-width-responsive="true"></ins></div>`;
-  }
-  return `<div class="ad ad-${pos}"><div class="ad-ph">${AD_LABEL[pos]}</div></div>`;
-}
-function fillAds(root) {
-  root.querySelectorAll("ins.adsbygoogle").forEach(el => {
-    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-  });
-}
-
 /* ===== 글 목록 =====
    글은 posts.json 에 저장됩니다. 글쓰기는 editor.html 에서 하세요. */
 let POSTS = [];
 
 const app = document.getElementById("app");
 document.getElementById("y").textContent = new Date().getFullYear();
-document.getElementById("ad-top").innerHTML = adHTML("top");
-document.getElementById("ad-side").innerHTML = adHTML("side");
-document.getElementById("ad-bottom").innerHTML = adHTML("bottom");
-fillAds(document);
 
 const fmt = d => d.replace(/-/g, ".");
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function renderList() {
   document.title = "뉴스정보";
-  const items = POSTS.map((p, i) => `
+  const items = POSTS.map(p => `
     <section class="post-item">
       <div class="meta"><time datetime="${p.date}">${fmt(p.date)}</time><br>${esc(p.category || "")}</div>
       <div class="txt">
@@ -125,9 +83,8 @@ function renderList() {
         <h2><a href="#/${p.id}">${esc(p.title)}</a></h2>
         <p>${esc(p.summary)}</p>
       </div>
-    </section>${i === 2 ? adHTML("middle") : ""}`).join("");
+    </section>`).join("");
   app.innerHTML = items;
-  fillAds(app);
 }
 
 function renderPost(id) {
@@ -137,20 +94,15 @@ function renderPost(id) {
     return;
   }
   document.title = p.title + " – 뉴스정보";
-  // 본문 두 번째 문단 뒤에 중간 광고 삽입 (문단이 1개면 그 뒤에)
-  const parts = p.html.split("</p>");
-  const at = parts.length > 3 ? 2 : 1;
-  const body = parts.map((t, i) => (i < parts.length - 1 ? t + "</p>" : t) + (i === at - 1 ? adHTML("middle") : "")).join("");
   app.innerHTML = `
     <a class="back" href="#/">목록으로 돌아가기</a>
     <article>
       <h1>${esc(p.title)}</h1>
       <time datetime="${p.date}">${fmt(p.date)}${p.category ? " · " + esc(p.category) : ""}</time>
       ${p.image ? `<img class="cover" src="${esc(p.image)}" alt="${esc(p.title)}">` : ""}
-      <div class="body">${body}</div>
+      <div class="body">${p.html}</div>
       ${p.source ? `<p class="src">출처: <a href="${esc(p.source)}" rel="noopener" target="_blank">${esc(new URL(p.source).hostname)}</a></p>` : ""}
     </article>`;
-  fillAds(app);
 }
 
 function route() {
